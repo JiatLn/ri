@@ -1,0 +1,2 @@
+# ri
+rust version ni
