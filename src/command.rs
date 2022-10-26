@@ -2,19 +2,25 @@ use std::process::{Child, Command};
 
 pub struct TheCommand {
     command: Command,
+    arg_0: String,
 }
 
 impl TheCommand {
     pub fn new() -> TheCommand {
-        let command = if cfg!(target_os = "windows") {
-            Command::new("cmd")
+        if cfg!(target_os = "windows") {
+            TheCommand {
+                command: Command::new("cmd"),
+                arg_0: "/C".to_string(),
+            }
         } else {
-            Command::new("sh")
-        };
-        TheCommand { command }
+            TheCommand {
+                command: Command::new("sh"),
+                arg_0: "-c".to_string(),
+            }
+        }
     }
 
     pub fn run(&mut self, args: Vec<String>) -> Child {
-        self.command.args(args).spawn().unwrap()
+        self.command.arg(&self.arg_0).args(args).spawn().unwrap()
     }
 }
