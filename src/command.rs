@@ -27,7 +27,8 @@ impl TheCommand {
     }
 
     pub fn gene_command(&self, agent: Agent, args: Vec<String>) -> String {
-        println!("{:?}", args);
+        println!("got the args: {:?}", args);
+
         if args.len() == 1 {
             match args[0].as_str().into() {
                 ShortCommand::Ri => format!("{} {}", agent.to_string(), "install".to_string()),

@@ -13,8 +13,6 @@ fn main() {
 
     println!("current agent is {:?}", &current_agent);
 
-    println!("got the args: {:?}", args);
-
     let command = command::TheCommand::new();
 
     let command = command.gene_command(current_agent, args);
