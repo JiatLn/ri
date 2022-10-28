@@ -11,7 +11,7 @@ use structopt::StructOpt;
 #[structopt(name = "Ri", about = "A rust version ni.")]
 struct Opt {
     #[structopt(subcommand)]
-    cmd: Command,
+    cmd: Option<Command>,
 }
 
 #[derive(StructOpt, Debug)]
@@ -20,7 +20,13 @@ enum Command {
     ///
     /// TODO
     /// add description
-    Ri { package_name: String },
+    I { package_name: Option<String> },
+
+    /// run
+    R,
+
+    #[structopt(external_subcommand)]
+    Other(Vec<String>),
 }
 
 fn main() {
