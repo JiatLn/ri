@@ -1,23 +1,43 @@
-#![cfg_attr(
-    debug_assertions,
-    allow(dead_code, unused_imports, unused_variables, unused_mut)
-)]
+#![cfg_attr(debug_assertions, allow(dead_code, unused_imports, unused_variables))]
 
 mod agents;
 mod args;
 mod command;
+
+use std::path::PathBuf;
+use structopt::StructOpt;
+
+#[derive(Debug, StructOpt)]
+#[structopt(name = "Ri", about = "A rust version ni.")]
+struct Opt {
+    #[structopt(subcommand)]
+    cmd: Command,
+}
+
+#[derive(StructOpt, Debug)]
+enum Command {
+    /// install package
+    ///
+    /// TODO
+    /// add description
+    Ri { package_name: String },
+}
+
 fn main() {
-    let args = args::Args::new();
+    let opt = Opt::from_args();
+    println!("{:?}", &opt.cmd);
 
-    let current_agent = agents::get_current_agent();
+    // let args = args::Args::new();
 
-    println!("current agent is {:?}", &current_agent);
+    // let current_agent = agents::get_current_agent();
 
-    let command = command::TheCommand::new();
+    // println!("current agent is {:?}", &current_agent);
 
-    let command = command.gene_command(current_agent, args);
+    // let command = command::TheCommand::new();
 
-    println!("the command is {:?}", command);
+    // let command = command.gene_command(current_agent, args);
+
+    // println!("the command is {:?}", command);
 
     // command.run(args);
 }
