@@ -1,6 +1,8 @@
-use std::{collections::HashMap, fs};
+use std::{collections::HashMap, fs, hash::Hash};
 
-#[derive(Debug)]
+use crate::commands::Command;
+
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub enum Agent {
     Bun,
     Pnpm,
@@ -19,22 +21,27 @@ impl Agent {
             _ => "todo".to_string(),
         }
     }
-}
-
-pub enum ShortCommand {
-    Ri,
-    Rr,
-    Ru,
-    Unkown,
-}
-
-impl From<&str> for ShortCommand {
-    fn from(s: &str) -> Self {
-        match s {
-            "ri" => ShortCommand::Ri,
-            "rr" => Self::Rr,
-            "ru" => Self::Ru,
-            _ => ShortCommand::Unkown,
+    pub fn get_agent_hash_map(agent: Agent) -> HashMap<Command, Option<String>> {
+        match agent {
+            Agent::Npm | Agent::None => HashMap::from([
+                (Command::Agent, Some("npm $0".to_string())),
+                (Command::Run, Some("npm run $0".to_string())),
+                (Command::Install, Some("npm i $0".to_string())),
+                (Command::Frozen, Some("npm ci".to_string())),
+                (Command::Global, Some("npm i -g $0".to_string())),
+                (Command::Add, Some("npm i $0".to_string())),
+                (Command::Upgrade, Some("npm update $0".to_string())),
+                (Command::UpgradeInteractive, None),
+                (Command::Execute, Some("npx $0".to_string())),
+                (Command::Uninstall, Some("npm uninstall $0".to_string())),
+                (
+                    Command::GlobalUninstall,
+                    Some("npm uninstall -g $0".to_string()),
+                ),
+            ]),
+            Agent::Bun => todo!(),
+            Agent::Yarn => todo!(),
+            Agent::Pnpm => todo!(),
         }
     }
 }
@@ -69,8 +76,13 @@ pub fn get_current_agent() -> Agent {
         }
     }
 
+    println!("Current agent is\n{:?}", &agent);
+
     match agent {
-        Agent::None => panic!("agent not found!"),
+        Agent::None => {
+            // TODO: pick agent by user
+            Agent::Npm
+        }
         _ => agent,
     }
 }
