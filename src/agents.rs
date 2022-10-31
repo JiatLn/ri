@@ -40,7 +40,28 @@ impl Agent {
                 ),
             ]),
             Agent::Bun => todo!(),
-            Agent::Yarn => todo!(),
+            Agent::Yarn => HashMap::from([
+                (Command::Agent, Some("yarn $0".to_string())),
+                (Command::Run, Some("yarn run $0".to_string())),
+                (Command::Install, Some("yarn install $0".to_string())),
+                (
+                    Command::Frozen,
+                    Some("yarn install --frozen-lockfile".to_string()),
+                ),
+                (Command::Global, Some("yarn global add $0".to_string())),
+                (Command::Add, Some("yarn add $0".to_string())),
+                (Command::Upgrade, Some("yarn upgrade $0".to_string())),
+                (
+                    Command::UpgradeInteractive,
+                    Some("yarn upgrade-interactive $0".to_string()),
+                ),
+                (Command::Execute, Some("yarn dlx $0".to_string())),
+                (Command::Uninstall, Some("yarn remove $0".to_string())),
+                (
+                    Command::GlobalUninstall,
+                    Some("yarn global remove $0".to_string()),
+                ),
+            ]),
             Agent::Pnpm => todo!(),
         }
     }
