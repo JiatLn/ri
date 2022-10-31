@@ -39,7 +39,22 @@ impl Agent {
                     Some("npm uninstall -g $0".to_string()),
                 ),
             ]),
-            Agent::Bun => todo!(),
+            Agent::Bun => HashMap::from([
+                (Command::Agent, Some("bun $0".to_string())),
+                (Command::Run, Some("bun run $0".to_string())),
+                (Command::Install, Some("bun install $0".to_string())),
+                (Command::Frozen, Some("bun install --no-save".to_string())),
+                (Command::Global, Some("bun add -g $0".to_string())),
+                (Command::Add, Some("bun add $0".to_string())),
+                (Command::Upgrade, None),
+                (Command::UpgradeInteractive, None),
+                (Command::Execute, None),
+                (Command::Uninstall, Some("bun remove $0".to_string())),
+                (
+                    Command::GlobalUninstall,
+                    Some("npm remove -g $0".to_string()),
+                ),
+            ]),
             Agent::Yarn => HashMap::from([
                 (Command::Agent, Some("yarn $0".to_string())),
                 (Command::Run, Some("yarn run $0".to_string())),
