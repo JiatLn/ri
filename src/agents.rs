@@ -62,7 +62,28 @@ impl Agent {
                     Some("yarn global remove $0".to_string()),
                 ),
             ]),
-            Agent::Pnpm => todo!(),
+            Agent::Pnpm => HashMap::from([
+                (Command::Agent, Some("pnpm $0".to_string())),
+                (Command::Run, Some("pnpm run $0".to_string())),
+                (Command::Install, Some("pnpm i $0".to_string())),
+                (
+                    Command::Frozen,
+                    Some("pnpm i --frozen-lockfile".to_string()),
+                ),
+                (Command::Global, Some("pnpm add -g $0".to_string())),
+                (Command::Add, Some("pnpm add $0".to_string())),
+                (Command::Upgrade, Some("pnpm update $0".to_string())),
+                (
+                    Command::UpgradeInteractive,
+                    Some("pnpm update -i $0".to_string()),
+                ),
+                (Command::Execute, Some("pnpm dlx $0".to_string())),
+                (Command::Uninstall, Some("pnpm remove $0".to_string())),
+                (
+                    Command::GlobalUninstall,
+                    Some("pnpm remove --global $0".to_string()),
+                ),
+            ]),
         }
     }
 }
