@@ -12,7 +12,7 @@ fn main() {
 
     let agent = agents::get_current_agent();
 
-    let parser = parse::Parser::parser_cmd(opt.cmd);
+    let mut parser = parse::Parser::parser_cmd(opt.cmd);
 
     println!("The command is:\n{}", parser.gene_command(agent));
 }

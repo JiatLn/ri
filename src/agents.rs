@@ -2,7 +2,7 @@ use std::{collections::HashMap, fs, hash::Hash};
 
 use crate::commands::Command;
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum Agent {
     Bun,
     Pnpm,

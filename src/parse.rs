@@ -5,7 +5,7 @@ use crate::{agents::Agent, commands::Command, opt::SubCommand};
 #[derive(Debug)]
 pub struct Parser {
     pub command: Command,
-    pub args: Option<String>,
+    pub args: Option<Vec<String>>,
 }
 
 impl Parser {
@@ -18,7 +18,7 @@ impl Parser {
             Some(sub_command) => match sub_command {
                 SubCommand::Un { package_name } => Parser {
                     command: Command::Uninstall,
-                    args: Some(package_name),
+                    args: Some(vec![package_name]),
                 },
                 SubCommand::R { run_name } => match run_name {
                     None => Parser {
@@ -27,7 +27,7 @@ impl Parser {
                     },
                     Some(name) => Parser {
                         command: Command::Run,
-                        args: Some(name),
+                        args: Some(vec![name]),
                     },
                 },
                 SubCommand::Other(v) => Parser::parser_other_args(v),
@@ -36,10 +36,10 @@ impl Parser {
     }
 
     fn parser_other_args(args: Vec<String>) -> Parser {
-        if args.len() == 1 {
+        if args.len() > 0 {
             Parser {
                 command: Command::Install,
-                args: Some(args[0].clone()),
+                args: Some(args.clone()),
             }
         } else {
             Parser {
@@ -51,8 +51,19 @@ impl Parser {
 }
 
 impl Parser {
-    pub fn gene_command(self, agent: Agent) -> String {
+    pub fn gene_command(&mut self, agent: Agent) -> String {
         let hash_map = Agent::get_agent_hash_map(agent);
+
+        // instand of yarn install xxx => yarn add xxx
+        match &agent {
+            Agent::Yarn | Agent::Pnpm => {
+                if self.command == Command::Install && self.args.is_some() {
+                    self.command = Command::Add
+                }
+            }
+            _ => (),
+        }
+
         match hash_map.get(&self.command) {
             None => panic!("got none"),
             Some(cmd) => match &cmd {
@@ -62,7 +73,7 @@ impl Parser {
                     if command.contains("$0") {
                         match &self.args {
                             None => command.replace("$0", "").trim().to_string(),
-                            Some(arg) => command.replace("$0", &arg),
+                            Some(arg) => command.replace("$0", &arg.join(" ")),
                         }
                     } else {
                         command
