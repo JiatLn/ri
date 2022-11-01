@@ -13,7 +13,7 @@ fn main() {
 
     dbg!(&opt);
 
-    let mut parser = parse::Parser::parser_cmd(opt.cmd, opt.frozen);
+    let mut parser = parse::Parser::parser_opt(opt);
 
     println!("The command is:\n{}", parser.gene_command(agent));
 }

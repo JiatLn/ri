@@ -1,4 +1,9 @@
-use crate::{agents::Agent, commands::Command, opt::SubCommand, utils::exclude};
+use crate::{
+    agents::Agent,
+    commands::Command,
+    opt::{Opt, SubCommand},
+    utils::exclude,
+};
 
 #[derive(Debug)]
 pub struct Parser {
@@ -7,13 +12,17 @@ pub struct Parser {
 }
 
 impl Parser {
-    pub fn parser_cmd(cmd: Option<SubCommand>, is_forzen: bool) -> Parser {
-        if is_forzen {
+    pub fn parser_opt(opt: Opt) -> Parser {
+        if opt.frozen {
             return Parser {
                 command: Command::Frozen,
                 args: None,
             };
         }
+        Parser::parser_cmd(opt.cmd)
+    }
+
+    fn parser_cmd(cmd: Option<SubCommand>) -> Parser {
         match cmd {
             None => Parser {
                 command: Command::Install,
