@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 use crate::{agents::Agent, commands::Command, opt::SubCommand, utils::exclude};
 
 #[derive(Debug)]

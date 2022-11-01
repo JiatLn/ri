@@ -1,5 +1,3 @@
-use crate::agents::Agent;
-
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub enum Command {
     Agent,

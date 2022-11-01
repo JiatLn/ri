@@ -1,6 +1,6 @@
-use std::{collections::HashMap, fs, hash::Hash};
+use std::{collections::HashMap, fs, hash::Hash, process};
 
-use crate::commands::Command;
+use crate::{commands::Command, utils::select_a_choice};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum Agent {
@@ -11,16 +11,31 @@ pub enum Agent {
     None,
 }
 
-impl Agent {
-    pub fn to_string(self) -> String {
-        match self {
-            Agent::Bun => "bun".to_string(),
-            Agent::Npm => "npm".to_string(),
-            Agent::Yarn => "yarn".to_string(),
-            Agent::Pnpm => "pnpm".to_string(),
-            _ => "todo".to_string(),
+impl From<String> for Agent {
+    fn from(agent: String) -> Self {
+        match agent {
+            agent if agent == "npm" => Agent::Npm,
+            agent if agent == "yarn" => Agent::Yarn,
+            agent if agent == "bun" => Agent::Bun,
+            agent if agent == "pnpm" => Agent::Pnpm,
+            _ => Agent::None,
         }
     }
+}
+
+impl From<Agent> for String {
+    fn from(agent: Agent) -> Self {
+        match agent {
+            agent if agent == Agent::Npm => "npm".to_string(),
+            agent if agent == Agent::Pnpm => "pnpm".to_string(),
+            agent if agent == Agent::Yarn => "yarn".to_string(),
+            agent if agent == Agent::Bun => "bun".to_string(),
+            _ => "NONE".to_string(),
+        }
+    }
+}
+
+impl Agent {
     pub fn get_agent_hash_map(agent: Agent) -> HashMap<Command, Option<String>> {
         match agent {
             Agent::Npm | Agent::None => HashMap::from([
@@ -137,8 +152,17 @@ pub fn get_current_agent() -> Agent {
 
     match agent {
         Agent::None => {
-            // TODO: pick agent by user
-            Agent::Npm
+            let agents = vec![
+                Agent::Npm.into(),
+                Agent::Pnpm.into(),
+                Agent::Yarn.into(),
+                Agent::Bun.into(),
+            ];
+            let answer = select_a_choice(&agents, "agent", "Choose the agent");
+            match answer {
+                Ok(ans) => ans.into(),
+                Err(_) => process::exit(1),
+            }
         }
         _ => agent,
     }

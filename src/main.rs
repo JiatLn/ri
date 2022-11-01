@@ -1,5 +1,3 @@
-#![cfg_attr(debug_assertions, allow(dead_code, unused_imports, unused_variables))]
-
 use structopt::StructOpt;
 
 mod agents;
