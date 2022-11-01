@@ -1,6 +1,6 @@
 use std::fmt::format;
 
-use crate::{agents::Agent, commands::Command, opt::SubCommand};
+use crate::{agents::Agent, commands::Command, opt::SubCommand, utils::exclude};
 
 #[derive(Debug)]
 pub struct Parser {
@@ -9,7 +9,13 @@ pub struct Parser {
 }
 
 impl Parser {
-    pub fn parser_cmd(cmd: Option<SubCommand>) -> Parser {
+    pub fn parser_cmd(cmd: Option<SubCommand>, is_forzen: bool) -> Parser {
+        if is_forzen {
+            return Parser {
+                command: Command::Frozen,
+                args: None,
+            };
+        }
         match cmd {
             None => Parser {
                 command: Command::Install,
@@ -36,16 +42,15 @@ impl Parser {
     }
 
     fn parser_other_args(args: Vec<String>) -> Parser {
-        if args.len() > 0 {
-            Parser {
-                command: Command::Install,
-                args: Some(args.clone()),
-            }
-        } else {
-            Parser {
-                command: Command::Unkown,
-                args: None,
-            }
+        if args.contains(&String::from("-g")) {
+            return Parser {
+                command: Command::Global,
+                args: Some(exclude(args, "-g")),
+            };
+        }
+        Parser {
+            command: Command::Install,
+            args: Some(args),
         }
     }
 }

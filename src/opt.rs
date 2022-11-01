@@ -6,6 +6,9 @@ use structopt::StructOpt;
 pub struct Opt {
     #[structopt(subcommand)]
     pub cmd: Option<SubCommand>,
+
+    #[structopt(short, long)]
+    pub frozen: bool,
 }
 
 #[derive(StructOpt, Debug)]
