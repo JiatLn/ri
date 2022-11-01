@@ -3,7 +3,7 @@ use structopt::StructOpt;
 mod agents;
 mod commands;
 mod opt;
-mod parse;
+mod parser;
 mod utils;
 
 fn main() {
@@ -13,7 +13,7 @@ fn main() {
 
     dbg!(&opt);
 
-    let mut parser = parse::Parser::parser_opt(opt);
+    let mut parser = parser::Parser::parser_opt(opt);
 
     println!("The command is:\n{}", parser.gene_command(agent));
 }
