@@ -2,7 +2,7 @@ use crate::{
     agents::Agent,
     commands::Command,
     opt::{Opt, SubCommand},
-    utils::exclude,
+    utils::{exclude, read_json_file, select_a_choice, PackageJson},
 };
 
 #[derive(Debug)]
@@ -34,10 +34,25 @@ impl Parser {
                     args: Some(vec![package_name]),
                 },
                 SubCommand::R { run_name } => match run_name {
-                    None => Parser {
-                        command: Command::Run,
-                        args: None,
-                    },
+                    None => {
+                        let PackageJson { scripts } = read_json_file("package.json").unwrap();
+                        let ans = select_a_choice(
+                            &scripts
+                                .unwrap()
+                                .iter()
+                                .map(|(k, _v)| k.to_string())
+                                .collect::<Vec<String>>(),
+                            "run",
+                            "pick a run script",
+                        )
+                        .unwrap();
+
+                        println!("{}", ans);
+                        Parser {
+                            command: Command::Run,
+                            args: Some(vec![ans]),
+                        }
+                    }
                     Some(name) => Parser {
                         command: Command::Run,
                         args: Some(vec![name]),
