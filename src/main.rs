@@ -14,11 +14,13 @@ fn main() {
 
     let agent = agents::get_current_agent();
 
-    let mut parser = parser::Parser::parser_opt(opt);
+    let mut parser = parser::Parser::parser_opt(&opt);
 
     let cmd = parser.gene_command(agent);
 
-    dbg!(&cmd);
-
-    runner::Runner::run(cmd);
+    if opt.debug {
+        println!("{}", cmd);
+    } else {
+        runner::Runner::run(cmd);
+    }
 }

@@ -12,14 +12,14 @@ pub struct Parser {
 }
 
 impl Parser {
-    pub fn parser_opt(opt: Opt) -> Parser {
+    pub fn parser_opt(opt: &Opt) -> Parser {
         if opt.frozen {
             return Parser {
                 command: Command::Frozen,
                 args: None,
             };
         }
-        Parser::parser_cmd(opt.cmd)
+        Parser::parser_cmd(opt.cmd.clone())
     }
 
     fn parser_cmd(cmd: Option<SubCommand>) -> Parser {

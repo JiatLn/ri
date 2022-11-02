@@ -8,9 +8,12 @@ pub struct Opt {
 
     #[structopt(short, long)]
     pub frozen: bool,
+
+    #[structopt(short, long)]
+    pub debug: bool,
 }
 
-#[derive(StructOpt, Debug)]
+#[derive(StructOpt, Debug, Clone)]
 pub enum SubCommand {
     /// uninstall package
     ///
