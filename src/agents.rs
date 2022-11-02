@@ -30,7 +30,7 @@ impl From<Agent> for String {
             agent if agent == Agent::Pnpm => "pnpm".to_string(),
             agent if agent == Agent::Yarn => "yarn".to_string(),
             agent if agent == Agent::Bun => "bun".to_string(),
-            _ => "NONE".to_string(),
+            _ => "Not Found".to_string(),
         }
     }
 }
@@ -148,7 +148,7 @@ pub fn get_current_agent() -> Agent {
         }
     }
 
-    println!("Current agent is\n{:?}", &agent);
+    println!("Current agent is {:?}", &agent);
 
     match agent {
         Agent::None => {
