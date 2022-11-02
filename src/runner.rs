@@ -5,14 +5,22 @@ pub struct Runner {
 }
 
 impl Runner {
-    pub fn run(args: Vec<String>) -> () {
+    pub fn run(cmd: String) -> () {
+        let args = cmd
+            .split(" ")
+            .map(|s| String::from(s))
+            .collect::<Vec<String>>();
+
         let mut runner = Self::new();
-        let _child = runner
+
+        runner
             .executor
             .command
             .arg(runner.executor.arg_0)
             .args(args)
             .spawn()
+            .unwrap()
+            .wait()
             .unwrap();
     }
 }

@@ -16,10 +16,5 @@ fn main() {
 
     let cmd = parser.gene_command(agent);
 
-    let args = cmd
-        .split(" ")
-        .map(|s| String::from(s))
-        .collect::<Vec<String>>();
-
-    runner::Runner::run(args);
+    runner::Runner::run(cmd);
 }
