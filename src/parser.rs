@@ -36,21 +36,19 @@ impl Parser {
                 SubCommand::R { run_name } => match run_name {
                     None => {
                         let PackageJson { scripts } = read_json_file("package.json").unwrap();
-                        let ans = select_a_choice(
-                            &scripts
-                                .unwrap()
-                                .iter()
-                                .map(|(k, _v)| k.to_string())
-                                .collect::<Vec<String>>(),
-                            "run",
-                            "pick a run script",
-                        )
-                        .unwrap();
+                        let script_choices = scripts
+                            .unwrap()
+                            .iter()
+                            .map(|(k, v)| format!("{} - {}", k, v))
+                            .collect::<Vec<String>>();
 
-                        println!("{}", ans);
+                        let ans = select_a_choice(&script_choices, "run", "script to run").unwrap();
+
+                        let script: Vec<&str> = ans.split(" - ").collect();
+
                         Parser {
                             command: Command::Run,
-                            args: Some(vec![ans]),
+                            args: Some(vec![script[0].to_string()]),
                         }
                     }
                     Some(name) => Parser {
