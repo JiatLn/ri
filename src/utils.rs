@@ -39,7 +39,7 @@ pub fn read_json_file<P: AsRef<Path>>(path: P) -> Result<PackageJson, Box<dyn Er
     // Read the JSON contents of the file as an instance of `PackageJson`.
     let pkg_json: PackageJson = serde_json::from_reader(reader)?;
 
-    println!("{:?}", &pkg_json.scripts);
+    // println!("{:?}", &pkg_json.scripts);
     // println!("{:?}", &pkg_json.packageManager);
 
     Ok(pkg_json)
