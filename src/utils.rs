@@ -17,11 +17,22 @@ pub fn select_a_choice(
     let select = Question::select(name)
         .message(message)
         .choices(vec_choices)
+        .transform(|choice, _previous_answers, backend| {
+            write!(
+                backend,
+                "{}",
+                choice.text.split(" - ").collect::<Vec<&str>>()[0]
+            )
+        })
         .build();
 
     let answer = requestty::prompt_one(select)?;
+
     match answer {
-        requestty::Answer::ListItem(ListItem { text, .. }) => Ok(text),
+        requestty::Answer::ListItem(ListItem { text, .. }) => {
+            let ans: Vec<&str> = text.split(" - ").collect();
+            Ok(ans[0].to_string())
+        }
         _ => process::exit(1),
     }
 }

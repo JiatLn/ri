@@ -1,8 +1,10 @@
+use std::process;
+
 use crate::{
     agents::Agent,
     commands::Command,
     opt::{Opt, SubCommand},
-    utils::{exclude, read_json_file, select_a_choice, PackageJson},
+    utils::{exclude, read_json_file, select_a_choice},
 };
 
 #[derive(Debug)]
@@ -35,20 +37,31 @@ impl Parser {
                 },
                 SubCommand::R { run_name } => match run_name {
                     None => {
-                        let PackageJson { scripts } = read_json_file("package.json").unwrap();
-                        let script_choices = scripts
-                            .unwrap()
-                            .iter()
-                            .map(|(k, v)| format!("{} - {}", k, v))
-                            .collect::<Vec<String>>();
+                        let package_json = read_json_file("package.json");
 
-                        let ans = select_a_choice(&script_choices, "run", "script to run").unwrap();
+                        match package_json {
+                            Ok(pkg_json) => {
+                                let script_choices = pkg_json
+                                    .scripts
+                                    .unwrap()
+                                    .iter()
+                                    .map(|(k, v)| format!("{} - {}", k, v))
+                                    .collect::<Vec<String>>();
 
-                        let script: Vec<&str> = ans.split(" - ").collect();
+                                let ans = select_a_choice(&script_choices, "run", "Script to run")
+                                    .unwrap();
 
-                        Parser {
-                            command: Command::Run,
-                            args: Some(vec![script[0].to_string()]),
+                                Parser {
+                                    command: Command::Run,
+                                    args: Some(vec![ans]),
+                                }
+                            }
+                            Err(err) => {
+                                println!("----------");
+                                println!("ERROR: {}", err.to_string());
+                                println!("----------");
+                                process::exit(-1)
+                            }
                         }
                     }
                     Some(name) => Parser {
