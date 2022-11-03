@@ -1,4 +1,4 @@
-use requestty::{ErrorKind, ListItem, Question};
+use requestty::{ErrorKind, ListItem, OnEsc, Question};
 use serde::Deserialize;
 
 use std::{collections::HashMap, error::Error, fs::File, io::BufReader, path::Path, process};
@@ -17,6 +17,7 @@ pub fn select_a_choice(
     let select = Question::select(name)
         .message(message)
         .choices(vec_choices)
+        .on_esc(OnEsc::Terminate)
         .transform(|choice, _previous_answers, backend| {
             write!(
                 backend,
