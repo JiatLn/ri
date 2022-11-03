@@ -1,4 +1,4 @@
-use std::process;
+use std::{error::Error, process};
 
 use crate::{
     agents::Agent,
@@ -21,55 +21,58 @@ impl Parser {
                 args: None,
             };
         }
-        Parser::parser_cmd(opt.cmd.clone())
+        let parser = Parser::parser_cmd(opt.cmd.clone());
+        match parser {
+            Ok(p) => p,
+            Err(e) => {
+                eprintln!("===========================");
+                eprintln!("Error: {}", e.to_string());
+                eprintln!("===========================");
+                process::exit(0);
+            }
+        }
     }
 
-    fn parser_cmd(cmd: Option<SubCommand>) -> Parser {
+    fn parser_cmd(cmd: Option<SubCommand>) -> Result<Parser, Box<dyn Error>> {
         match cmd {
-            None => Parser {
+            None => Ok(Parser {
                 command: Command::Install,
                 args: None,
-            },
+            }),
             Some(sub_command) => match sub_command {
-                SubCommand::Un { package_name } => Parser {
+                SubCommand::Un { package_name } => Ok(Parser {
                     command: Command::Uninstall,
                     args: Some(vec![package_name]),
-                },
+                }),
                 SubCommand::R { run_name } => match run_name {
                     None => {
-                        let package_json = read_json_file("package.json");
+                        let package_json = read_json_file("package.json")?;
+                        let script = package_json
+                            .scripts
+                            .ok_or("package.json scripts not found!")?;
+                        let script_choices = script
+                            .iter()
+                            .map(|(k, v)| format!("{} - {}", k, v))
+                            .collect::<Vec<String>>();
 
-                        match package_json {
-                            Ok(pkg_json) => {
-                                let script_choices = pkg_json
-                                    .scripts
-                                    .unwrap()
-                                    .iter()
-                                    .map(|(k, v)| format!("{} - {}", k, v))
-                                    .collect::<Vec<String>>();
-
-                                let ans = select_a_choice(&script_choices, "run", "Script to run")
-                                    .unwrap();
-
-                                Parser {
-                                    command: Command::Run,
-                                    args: Some(vec![ans]),
-                                }
-                            }
-                            Err(err) => {
-                                println!("----------");
-                                println!("ERROR: {}", err.to_string());
-                                println!("----------");
-                                process::exit(-1)
-                            }
+                        if script_choices.len() == 0 {
+                            eprintln!("package.json scripts is empty");
+                            process::exit(1)
                         }
+
+                        let ans = select_a_choice(&script_choices, "run", "Script to run")?;
+
+                        Ok(Parser {
+                            command: Command::Run,
+                            args: Some(vec![ans]),
+                        })
                     }
-                    Some(name) => Parser {
+                    Some(name) => Ok(Parser {
                         command: Command::Run,
                         args: Some(vec![name]),
-                    },
+                    }),
                 },
-                SubCommand::Other(v) => Parser::parser_other_args(v),
+                SubCommand::Other(v) => Ok(Parser::parser_other_args(v)),
             },
         }
     }
@@ -82,7 +85,7 @@ impl Parser {
             };
         }
         Parser {
-            command: Command::Install,
+            command: Command::Add,
             args: Some(args),
         }
     }

@@ -16,9 +16,11 @@ fn main() {
 
     let cmd = parser.gene_command(agent);
 
+    println!("{}", cmd);
+
     if opt.debug {
-        println!("{}", cmd);
-    } else {
-        runner::Runner::run(cmd);
+        return;
     }
+
+    runner::Runner::run(cmd);
 }

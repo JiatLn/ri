@@ -46,6 +46,7 @@ pub struct PackageJson {
 
 pub fn read_json_file<P: AsRef<Path>>(path: P) -> Result<PackageJson, Box<dyn Error>> {
     let file = File::open(path)?;
+
     let reader = BufReader::new(file);
 
     // Read the JSON contents of the file as an instance of `PackageJson`.
