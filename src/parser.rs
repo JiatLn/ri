@@ -21,7 +21,7 @@ impl Parser {
                 args: None,
             };
         }
-        let parser = Parser::parser_cmd(opt.cmd.clone());
+        let parser = Parser::parser_cmd(opt);
         match parser {
             Ok(p) => p,
             Err(e) => {
@@ -33,17 +33,23 @@ impl Parser {
         }
     }
 
-    fn parser_cmd(cmd: Option<SubCommand>) -> Result<Parser, Box<dyn Error>> {
-        match cmd {
+    fn parser_cmd(opt: &Opt) -> Result<Parser, Box<dyn Error>> {
+        match &opt.cmd {
             None => Ok(Parser {
                 command: Command::Install,
                 args: None,
             }),
             Some(sub_command) => match sub_command {
-                SubCommand::Un { package_name } => Ok(Parser {
-                    command: Command::Uninstall,
-                    args: Some(vec![package_name]),
-                }),
+                SubCommand::Un { package_name } => match opt.global {
+                    true => Ok(Parser {
+                        command: Command::GlobalUninstall,
+                        args: Some(package_name.clone()),
+                    }),
+                    false => Ok(Parser {
+                        command: Command::Uninstall,
+                        args: Some(package_name.clone()),
+                    }),
+                },
                 SubCommand::R { run_name } => match run_name {
                     None => {
                         let package_json = read_json_file("package.json")?;
@@ -69,10 +75,10 @@ impl Parser {
                     }
                     Some(name) => Ok(Parser {
                         command: Command::Run,
-                        args: Some(vec![name]),
+                        args: Some(vec![name.to_string()]),
                     }),
                 },
-                SubCommand::Other(v) => Ok(Parser::parser_other_args(v)),
+                SubCommand::Other(v) => Ok(Parser::parser_other_args(v.clone())),
             },
         }
     }

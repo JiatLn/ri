@@ -11,6 +11,9 @@ pub struct Opt {
 
     #[structopt(short, long)]
     pub debug: bool,
+
+    #[structopt(short, long)]
+    pub global: bool,
 }
 
 #[derive(StructOpt, Debug, Clone)]
@@ -19,7 +22,7 @@ pub enum SubCommand {
     ///
     /// TODO:
     /// add description
-    Un { package_name: String },
+    Un { package_name: Vec<String> },
 
     /// run
     R { run_name: Option<String> },
