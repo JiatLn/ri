@@ -1,8 +1,8 @@
-use std::{collections::HashMap, fs, hash::Hash, process};
+use std::{collections::HashMap, fs};
 
-use crate::{commands::Command, utils::select_a_choice};
+use crate::{commands::Command, error::CommonError, utils::select_a_choice};
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Agent {
     Bun,
     Pnpm,
@@ -136,7 +136,7 @@ impl Agents {
     }
 }
 
-pub fn get_current_agent() -> Agent {
+pub fn get_current_agent() -> Result<Agent, CommonError> {
     let mut agent = Agent::None;
 
     let agents = Agents::new();
@@ -148,22 +148,19 @@ pub fn get_current_agent() -> Agent {
         }
     }
 
-    println!("Current agent is {:?}", &agent);
+    println!("Current agent is {}", String::from(agent));
 
     match agent {
         Agent::None => {
-            let agents = vec![
-                Agent::Npm.into(),
-                Agent::Pnpm.into(),
-                Agent::Yarn.into(),
-                Agent::Bun.into(),
-            ];
-            let answer = select_a_choice(&agents, "agent", "Choose the agent");
-            match answer {
-                Ok(ans) => ans.into(),
-                Err(_) => process::exit(1),
-            }
+            let agents = vec![Agent::Npm, Agent::Pnpm, Agent::Yarn, Agent::Bun]
+                .iter()
+                .map(|&a| a.into())
+                .collect::<Vec<String>>();
+
+            let agent = select_a_choice(&agents, "agent", "Choose the agent")?.into();
+
+            Ok(agent)
         }
-        _ => agent,
+        _ => Ok(agent),
     }
 }

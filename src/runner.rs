@@ -1,3 +1,4 @@
+use crate::error::CommonError;
 use std::process::Command;
 
 pub struct Runner {
@@ -5,7 +6,7 @@ pub struct Runner {
 }
 
 impl Runner {
-    pub fn run(cmd: String) -> () {
+    pub fn run(cmd: String) -> Result<(), CommonError> {
         let args = cmd
             .split(" ")
             .map(|s| String::from(s))
@@ -18,10 +19,10 @@ impl Runner {
             .command
             .arg(runner.executor.arg_0)
             .args(args)
-            .spawn()
-            .unwrap()
-            .wait()
-            .unwrap();
+            .spawn()?
+            .wait()?;
+
+        Ok(())
     }
 }
 

@@ -1,8 +1,9 @@
-use std::{error::Error, process};
+use std::process;
 
 use crate::{
     agents::Agent,
     commands::Command,
+    error::CommonError,
     opt::{Opt, SubCommand},
     utils::{exclude, read_json_file, select_a_choice},
 };
@@ -26,14 +27,14 @@ impl Parser {
             Ok(p) => p,
             Err(e) => {
                 eprintln!("===========================");
-                eprintln!("Error: {}", e.to_string());
+                eprintln!("{}", e);
                 eprintln!("===========================");
                 process::exit(0);
             }
         }
     }
 
-    fn parser_cmd(opt: &Opt) -> Result<Parser, Box<dyn Error>> {
+    fn parser_cmd(opt: &Opt) -> Result<Parser, CommonError> {
         match &opt.cmd {
             None => Ok(Parser {
                 command: Command::Install,
@@ -53,25 +54,28 @@ impl Parser {
                 SubCommand::R { run_name } => match run_name {
                     None => {
                         let package_json = read_json_file("package.json")?;
-                        let script = package_json
-                            .scripts
-                            .ok_or("package.json scripts not found!")?;
+                        let script = package_json.scripts.ok_or(CommonError::NotFound(
+                            "package.json scripts field not found!".to_string(),
+                        ))?;
+
                         let script_choices = script
                             .iter()
                             .map(|(k, v)| format!("{} - {}", k, v))
                             .collect::<Vec<String>>();
 
-                        if script_choices.len() == 0 {
-                            eprintln!("package.json scripts is empty");
-                            process::exit(1)
+                        match script_choices.len() {
+                            0 => Err(CommonError::JsonParseError(
+                                "package.json scripts field is empty!".to_string(),
+                            )),
+                            _ => {
+                                let ans = select_a_choice(&script_choices, "run", "Script to run")?;
+
+                                Ok(Parser {
+                                    command: Command::Run,
+                                    args: Some(vec![ans]),
+                                })
+                            }
                         }
-
-                        let ans = select_a_choice(&script_choices, "run", "Script to run")?;
-
-                        Ok(Parser {
-                            command: Command::Run,
-                            args: Some(vec![ans]),
-                        })
                     }
                     Some(name) => Ok(Parser {
                         command: Command::Run,

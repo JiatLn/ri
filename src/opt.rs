@@ -19,12 +19,9 @@ pub struct Opt {
 #[derive(StructOpt, Debug, Clone)]
 pub enum SubCommand {
     /// uninstall package
-    ///
-    /// TODO:
-    /// add description
     Un { package_name: Vec<String> },
 
-    /// run
+    /// run script
     R { run_name: Option<String> },
 
     #[structopt(external_subcommand)]

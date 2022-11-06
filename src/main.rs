@@ -1,16 +1,18 @@
+use error::CommonError;
 use structopt::StructOpt;
 
 mod agents;
 mod commands;
+mod error;
 mod opt;
 mod parser;
 mod runner;
 mod utils;
 
-fn main() {
+fn main() -> Result<(), CommonError> {
     let opt = opt::Opt::from_args();
 
-    let agent = agents::get_current_agent();
+    let agent = agents::get_current_agent()?;
 
     let mut parser = parser::Parser::parser_opt(&opt);
 
@@ -19,8 +21,11 @@ fn main() {
     println!("{}", cmd);
 
     if opt.debug {
-        return;
+        return Ok(());
     }
 
-    runner::Runner::run(cmd);
+    match runner::Runner::run(cmd) {
+        Ok(_) => Ok(()),
+        Err(err) => panic!("{}", err),
+    }
 }

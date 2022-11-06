@@ -1,7 +1,7 @@
-use requestty::{ErrorKind, ListItem, OnEsc, Question};
+use crate::error::CommonError;
+use requestty::{ListItem, OnEsc, Question};
 use serde::Deserialize;
-
-use std::{collections::HashMap, error::Error, fs::File, io::BufReader, path::Path, process};
+use std::{collections::HashMap, fs::File, io::BufReader, path::Path, process};
 
 pub fn exclude(args: Vec<String>, v: &str) -> Vec<String> {
     args.into_iter()
@@ -13,7 +13,7 @@ pub fn select_a_choice(
     vec_choices: &Vec<String>,
     name: &str,
     message: &str,
-) -> Result<String, ErrorKind> {
+) -> Result<String, CommonError> {
     let select = Question::select(name)
         .message(message)
         .choices(vec_choices)
@@ -44,16 +44,13 @@ pub struct PackageJson {
     // pub packageManager: Option<String>,
 }
 
-pub fn read_json_file<P: AsRef<Path>>(path: P) -> Result<PackageJson, Box<dyn Error>> {
+pub fn read_json_file<P: AsRef<Path>>(path: P) -> Result<PackageJson, CommonError> {
     let file = File::open(path)?;
 
     let reader = BufReader::new(file);
 
     // Read the JSON contents of the file as an instance of `PackageJson`.
     let pkg_json: PackageJson = serde_json::from_reader(reader)?;
-
-    // println!("{:?}", &pkg_json.scripts);
-    // println!("{:?}", &pkg_json.packageManager);
 
     Ok(pkg_json)
 }
