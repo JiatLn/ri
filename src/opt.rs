@@ -9,19 +9,24 @@ pub struct Opt {
     #[structopt(short, long)]
     pub frozen: bool,
 
+    /// Debug mode will not run the command
     #[structopt(short, long)]
     pub debug: bool,
 
     #[structopt(short, long)]
     pub global: bool,
+
+    /// Remove node_modules
+    #[structopt(short, long)]
+    pub clean: bool,
 }
 
 #[derive(StructOpt, Debug, Clone)]
 pub enum SubCommand {
-    /// uninstall package
+    /// Uninstall package
     Un { package_name: Vec<String> },
 
-    /// run script
+    /// Run script
     R { run_name: Option<String> },
 
     #[structopt(external_subcommand)]

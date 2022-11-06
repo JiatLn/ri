@@ -37,7 +37,10 @@ impl From<std::io::Error> for CommonError {
     fn from(err: std::io::Error) -> Self {
         match err.kind() {
             std::io::ErrorKind::NotFound => Self::NotFound(err.to_string()),
-            _ => Self::Uninitialized,
+            err => {
+                dbg!(err);
+                Self::Uninitialized
+            }
         }
     }
 }

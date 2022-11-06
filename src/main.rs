@@ -16,15 +16,18 @@ fn run() -> Result<(), CommonError> {
 
     let cmd = parser::Parser::parser_opt(&opt)?.gene_command(agent);
 
-    println!("{}", cmd);
+    match cmd {
+        Some(str) => {
+            println!("{}", str);
 
-    if opt.debug {
-        return Ok(());
+            if !opt.debug {
+                runner::Runner::run(str)?;
+            }
+
+            Ok(())
+        }
+        None => Ok(()),
     }
-
-    runner::Runner::run(cmd)?;
-
-    Ok(())
 }
 
 fn main() -> () {

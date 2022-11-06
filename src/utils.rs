@@ -1,7 +1,7 @@
 use crate::error::CommonError;
 use requestty::{ListItem, OnEsc, Question};
 use serde::Deserialize;
-use std::{collections::HashMap, fs::File, io::BufReader, path::Path, process};
+use std::{collections::HashMap, fs, io::BufReader, path::Path, process};
 
 pub fn exclude(args: Vec<String>, v: &str) -> Vec<String> {
     args.into_iter()
@@ -45,7 +45,7 @@ pub struct PackageJson {
 }
 
 pub fn read_json_file<P: AsRef<Path>>(path: P) -> Result<PackageJson, CommonError> {
-    let file = File::open(path)?;
+    let file = fs::File::open(path)?;
 
     let reader = BufReader::new(file);
 
@@ -53,4 +53,23 @@ pub fn read_json_file<P: AsRef<Path>>(path: P) -> Result<PackageJson, CommonErro
     let pkg_json: PackageJson = serde_json::from_reader(reader)?;
 
     Ok(pkg_json)
+}
+
+pub fn remove_dir_all_file_with_path<P: AsRef<Path>>(path: P) -> Result<(), CommonError> {
+    fs::remove_dir_all(path)?;
+    Ok(())
+}
+
+pub fn ask_confirm_question(question_content: &str) -> Result<bool, CommonError> {
+    let confirm = Question::confirm("q")
+        .message(question_content)
+        .default(false)
+        .build();
+
+    let confirm = requestty::prompt_one(confirm)?.as_bool();
+
+    match confirm {
+        Some(b) => Ok(b),
+        None => Ok(false),
+    }
 }

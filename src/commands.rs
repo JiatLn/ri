@@ -12,4 +12,5 @@ pub enum Command {
     GlobalUninstall,
     Execute,
     UpgradeInteractive,
+    IgnoredCommand,
 }

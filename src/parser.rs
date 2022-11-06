@@ -3,7 +3,7 @@ use crate::{
     commands::Command,
     error::CommonError,
     opt::{Opt, SubCommand},
-    utils::{exclude, read_json_file, select_a_choice},
+    utils::{self, exclude},
 };
 
 #[derive(Debug)]
@@ -20,7 +20,24 @@ impl Parser {
                 args: None,
             });
         }
+
+        if opt.clean {
+            // TODO: remove node_modules
+
+            let remove = utils::ask_confirm_question("Do you want to remove node_modules?")?;
+
+            if remove && !opt.debug {
+                utils::remove_dir_all_file_with_path("node_modules")?;
+            }
+
+            return Ok(Parser {
+                command: Command::IgnoredCommand,
+                args: None,
+            });
+        }
+
         let parser = Parser::parser_cmd(opt)?;
+
         Ok(parser)
     }
 
@@ -43,7 +60,7 @@ impl Parser {
                 },
                 SubCommand::R { run_name } => match run_name {
                     None => {
-                        let package_json = read_json_file("package.json")?;
+                        let package_json = utils::read_json_file("package.json")?;
                         let script = package_json.scripts.ok_or(CommonError::NotFound(
                             "package.json scripts field not found!".to_string(),
                         ))?;
@@ -58,7 +75,11 @@ impl Parser {
                                 "package.json scripts field is empty!".to_string(),
                             )),
                             _ => {
-                                let ans = select_a_choice(&script_choices, "run", "Script to run")?;
+                                let ans = utils::select_a_choice(
+                                    &script_choices,
+                                    "run",
+                                    "Script to run",
+                                )?;
 
                                 Ok(Parser {
                                     command: Command::Run,
@@ -92,7 +113,11 @@ impl Parser {
 }
 
 impl Parser {
-    pub fn gene_command(&mut self, agent: Agent) -> String {
+    pub fn gene_command(&mut self, agent: Agent) -> Option<String> {
+        if self.command == Command::IgnoredCommand {
+            return None;
+        }
+
         let hash_map = Agent::get_agent_hash_map(agent);
 
         // instand of yarn install xxx => yarn add xxx
@@ -106,21 +131,21 @@ impl Parser {
         }
 
         match hash_map.get(&self.command) {
-            None => panic!("got none"),
             Some(cmd) => match &cmd {
-                None => panic!("got ignore"),
                 Some(cmd) => {
                     let command = cmd.clone();
                     if command.contains("$0") {
                         match &self.args {
-                            None => command.replace("$0", "").trim().to_string(),
-                            Some(arg) => command.replace("$0", &arg.join(" ")),
+                            None => Some(command.replace("$0", "").trim().to_string()),
+                            Some(arg) => Some(command.replace("$0", &arg.join(" "))),
                         }
                     } else {
-                        command
+                        Some(command)
                     }
                 }
+                None => None,
             },
+            None => None,
         }
     }
 }
