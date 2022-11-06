@@ -1,2 +1,9 @@
 /target
 /node_modules
+
+package.json
+package-lock.json
+yarn.lock
+npm-shrinkwrap.json
+bun.lockb
+pnpm-lock.yaml
