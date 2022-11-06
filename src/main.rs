@@ -9,14 +9,12 @@ mod parser;
 mod runner;
 mod utils;
 
-fn main() -> Result<(), CommonError> {
+fn run() -> Result<(), CommonError> {
     let opt = opt::Opt::from_args();
 
     let agent = agents::get_current_agent()?;
 
-    let mut parser = parser::Parser::parser_opt(&opt);
-
-    let cmd = parser.gene_command(agent);
+    let cmd = parser::Parser::parser_opt(&opt)?.gene_command(agent);
 
     println!("{}", cmd);
 
@@ -24,8 +22,14 @@ fn main() -> Result<(), CommonError> {
         return Ok(());
     }
 
-    match runner::Runner::run(cmd) {
-        Ok(_) => Ok(()),
-        Err(err) => panic!("{}", err),
+    runner::Runner::run(cmd)?;
+
+    Ok(())
+}
+
+fn main() -> () {
+    match run() {
+        Ok(_) => (),
+        Err(err) => eprintln!("{}", err),
     }
 }

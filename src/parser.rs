@@ -1,5 +1,3 @@
-use std::process;
-
 use crate::{
     agents::Agent,
     commands::Command,
@@ -11,27 +9,19 @@ use crate::{
 #[derive(Debug)]
 pub struct Parser {
     pub command: Command,
-    pub args: Option<Vec<String>>,
+    args: Option<Vec<String>>,
 }
 
 impl Parser {
-    pub fn parser_opt(opt: &Opt) -> Parser {
+    pub fn parser_opt(opt: &Opt) -> Result<Parser, CommonError> {
         if opt.frozen {
-            return Parser {
+            return Ok(Parser {
                 command: Command::Frozen,
                 args: None,
-            };
+            });
         }
-        let parser = Parser::parser_cmd(opt);
-        match parser {
-            Ok(p) => p,
-            Err(e) => {
-                eprintln!("===========================");
-                eprintln!("{}", e);
-                eprintln!("===========================");
-                process::exit(0);
-            }
-        }
+        let parser = Parser::parser_cmd(opt)?;
+        Ok(parser)
     }
 
     fn parser_cmd(opt: &Opt) -> Result<Parser, CommonError> {
