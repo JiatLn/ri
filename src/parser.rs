@@ -22,26 +22,47 @@ impl Parser {
         }
 
         if opt.clean {
-            // TODO: remove node_modules
-
-            let remove = utils::ask_confirm_question("Do you want to remove node_modules?")?;
-
-            if remove && !opt.debug {
-                utils::remove_dir_all_file_with_path("node_modules")?;
-            }
-
-            return Ok(Parser {
-                command: Command::IgnoredCommand,
-                args: None,
-            });
+            return Self::parse_clean(opt);
         }
 
-        let parser = Parser::parser_cmd(opt)?;
+        let parser = Parser::parse_cmd(opt)?;
 
         Ok(parser)
     }
 
-    fn parser_cmd(opt: &Opt) -> Result<Parser, CommonError> {
+    fn parse_clean(opt: &Opt) -> Result<Parser, CommonError> {
+        match &opt.cmd {
+            Some(v) => match v {
+                SubCommand::Other(c) => {
+                    if &c[0] == "lock" {
+                        let remove =
+                            utils::ask_confirm_question("Do you want to remove lockfile?")?;
+
+                        if remove && !opt.debug {
+                            utils::remove_lock_files()?;
+                            println!("remove success!")
+                        }
+                    }
+                }
+                _ => (),
+            },
+            None => {
+                let remove = utils::ask_confirm_question("Do you want to remove node_modules?")?;
+
+                if remove && !opt.debug {
+                    utils::remove_dir_all_file_with_path("node_modules")?;
+                    println!("remove success!")
+                }
+            }
+        }
+
+        Ok(Parser {
+            command: Command::IgnoredCommand,
+            args: None,
+        })
+    }
+
+    fn parse_cmd(opt: &Opt) -> Result<Parser, CommonError> {
         match &opt.cmd {
             None => Ok(Parser {
                 command: Command::Install,

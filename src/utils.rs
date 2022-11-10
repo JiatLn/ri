@@ -1,4 +1,4 @@
-use crate::error::CommonError;
+use crate::{agents::Agents, error::CommonError};
 use requestty::{ListItem, OnEsc, Question};
 use serde::Deserialize;
 use std::{collections::HashMap, fs, io::BufReader, path::Path, process};
@@ -57,6 +57,15 @@ pub fn read_json_file<P: AsRef<Path>>(path: P) -> Result<PackageJson, CommonErro
 
 pub fn remove_dir_all_file_with_path<P: AsRef<Path>>(path: P) -> Result<(), CommonError> {
     fs::remove_dir_all(path)?;
+    Ok(())
+}
+
+pub fn remove_lock_files() -> Result<(), CommonError> {
+    for (file_name, _) in Agents::new().lock_map {
+        if fs::read(&file_name).is_ok() {
+            fs::remove_file(file_name)?;
+        }
+    }
     Ok(())
 }
 
