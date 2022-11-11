@@ -81,6 +81,11 @@ rni un webpack
 # bun remove webpack
 ```
 
+### `rni -c` - clean your workspace
+
+- use `rni -c` to remove node_modules/**
+- use `rni -c lock` to remove lockfile of current agent, like `yarn.lock` / `pnpm-lock.yaml` / `package-lock.json` / `bun.lockb`
+
 <br>
 
 ### How?
